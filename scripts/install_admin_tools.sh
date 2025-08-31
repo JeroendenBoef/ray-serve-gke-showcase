@@ -7,6 +7,14 @@ sudo apt-get update -y
 # Make
 sudo apt-get install -y make
 
+# Age
+sudo apt-get install -y age
+
+# SOPS
+curl -LO https://github.com/getsops/sops/releases/download/v3.10.2/sops-v3.10.2.linux.amd64
+mv sops-v3.10.2.linux.amd64 /usr/local/bin/sops
+chmod +x /usr/local/bin/sops
+
 # Google Cloud CLI
 echo "[*] Installing Google Cloud CLI..."
 curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
