@@ -28,6 +28,8 @@ module "gke" {
   ip_range_pods     = null
   ip_range_services = null
 
+  identity_namespace = "${var.project_id}.svc.id.goog"
+
   node_pools = [
     {
       name               = "cpu-pool"
