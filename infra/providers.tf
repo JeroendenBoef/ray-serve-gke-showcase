@@ -6,10 +6,7 @@ terraform {
       version = "~> 6.0"
     }
   }
-  backend "gcs" {
-    bucket = "tf-state-ray-serve-gke-showcase-1122"
-    prefix = "infra"
-  }
+  backend "gcs" {}
 }
 
 provider "google" {
