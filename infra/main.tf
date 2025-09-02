@@ -20,6 +20,8 @@ module "gke" {
 
   identity_namespace = "${var.project_id}.svc.id.goog"
 
+  deletion_protection = false
+
   node_pools = [
     {
       name               = "cpu-pool"
