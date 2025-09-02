@@ -18,7 +18,8 @@ curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --de
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
   | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
 sudo apt-get update -y
-sudo apt-get install -y google-cloud-cli
+sudo apt-get install -y google-cloud-cli 
+sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
 
 # Terraform
 echo "[*] Installing Terraform..."
