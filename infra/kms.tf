@@ -1,11 +1,11 @@
 resource "google_kms_key_ring" "flux" {
-  name     = "flux-sops"
+  name     = "flux-sops-tf"
   location = var.region
   project  = var.project_id
 }
 
 resource "google_kms_crypto_key" "sops" {
-  name            = "sops-key"
+  name            = "sops-key-tf"
   key_ring        = google_kms_key_ring.flux.id
   purpose         = "ENCRYPT_DECRYPT"
   rotation_period = "2592000s"
