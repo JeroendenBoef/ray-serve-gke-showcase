@@ -1,0 +1,4 @@
+creation_rules:
+  - path_regex: 'apps/.*/secrets/.*\.ya?ml'
+    encrypted_regex: '^(data|stringData)$'
+    gcp_kms: projects/${PROJECT_ID}/locations/${REGION}/keyRings/${KMS_KEY_RING}/cryptoKeys/${KMS_CRYPTO_KEY}
