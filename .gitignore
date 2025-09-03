@@ -1,3 +1,4 @@
 .env
 tfplan
 *.terraform*
+.sops.yaml
