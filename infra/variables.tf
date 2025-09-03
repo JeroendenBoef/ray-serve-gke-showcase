@@ -14,3 +14,11 @@ variable "cluster_name" {
   type    = string
   default = "ray-serve-gke"
 }
+
+variable "kms_key_ring" { 
+  type    = string
+}
+
+variable "kms_crypto_key" {
+  type    = string
+  }
