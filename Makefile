@@ -7,7 +7,7 @@ export TF_VAR_zone=$(ZONE)
 export TF_VAR_kms_key_ring=$(KMS_KEY_RING)
 export TF_VAR_kms_crypto_key=$(KMS_CRYPTO_KEY)
 
-.PHONY: bootstrap-init bootstrap-plan bootstrap-apply init plan plan-save apply-plan infra creds destroy  flux-wi flux-bootstrap 
+.PHONY: bootstrap-init bootstrap-plan bootstrap-apply init plan plan-save apply-plan infra creds destroy  flux-wi flux-bootstrap sops-init sops-encrypt sops-edit sops-verify
 
 bootstrap-init:
 	cd infra-bootstrap && terraform init \
@@ -55,3 +55,20 @@ flux-bootstrap:
 	  --repository $${GH_REPO:?set GH_REPO in .env} \
 	  --branch $${GH_BRANCH:-main} \
 	  --path clusters/prod
+
+# Generate .sops.yaml from .env and .sops.yaml.tmpl
+sops-init:
+	@[ -f .env ] || (echo "Missing .env; copy .env.example -> .env and fill in"; exit 1)
+	envsubst < .sops.yaml.tmpl > .sops.yaml
+	@echo "Rendered .sops.yaml from template."
+
+# Encrypt a file with sops (usage: make sops-encrypt FILE=apps/monitoring/secrets/grafana-admin.yaml)
+sops-encrypt:
+	@[ -n "$$FILE" ] || (echo "Usage: make sops-encrypt FILE=path/to/secret.yaml"; exit 1)
+	sops --encrypt --in-place $$FILE
+	@echo "Encrypted $$FILE"
+
+# Verify communication of current creds <> KMS
+sops-verify:
+	@gcloud auth application-default print-access-token >/dev/null || (echo "Run: gcloud auth application-default login"; exit 1)
+	@echo "ADC OK. Ensure your user has roles/cloudkms.cryptoKeyEncrypterDecrypter on the key."
