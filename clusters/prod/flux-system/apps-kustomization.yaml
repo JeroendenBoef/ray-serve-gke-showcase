@@ -11,5 +11,5 @@ spec:
     name: flux-system
   path: ./clusters/apps
   wait: true
-  # decryption:
-  #   provider: sops
+  decryption:
+    provider: sops
