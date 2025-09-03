@@ -8,6 +8,7 @@ resource "google_project_service" "services" {
     "artifactregistry.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com",
+    "cloudkms.googleapis.com",
   ])
   project            = var.project_id
   service            = each.value
