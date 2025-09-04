@@ -9,7 +9,7 @@ metadata:
   name: rayservice-serve
   namespace: ray
 spec:
-  serveConfigV2:
+  serveConfigV2: |
     applications:
       - name: transformer-pipeline
         route_prefix: /infer
