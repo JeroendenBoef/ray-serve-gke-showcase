@@ -18,7 +18,6 @@ spec:
           working_dir: "https://github.com/JeroendenBoef/ray-serve-gke-showcase/archive/refs/heads/add_flux.zip"
           pip:
             - "transformers==4.43.4"
-            - "torch==2.3.1"
   rayClusterConfig:
     rayVersion: "2.9.0"
     enableInTreeAutoscaling: true
@@ -30,7 +29,7 @@ spec:
           nodeSelector: { pool: "cpu" }
           containers:
             - name: ray-head
-              image: "rayproject/ray-ml:2.9.0-py310-cu121"
+              image: "rayproject/ray-ml:2.9.0-py310-gpu"
               imagePullPolicy: IfNotPresent
               resources:
                 requests: { cpu: "500m", memory: "2Gi" }
@@ -48,7 +47,7 @@ spec:
             nodeSelector: { pool: "cpu" }
             containers:
               - name: ray-worker
-                image: "rayproject/ray-ml:2.9.0-py310-cu121"
+                image: "rayproject/ray-ml:2.9.0-py310-gpu"
                 resources:
                   requests: { cpu: "500m", memory: "2Gi" }
                   limits:   { cpu: "1",    memory: "4Gi" }
@@ -68,7 +67,7 @@ spec:
                 effect: "NoSchedule"
             containers:
               - name: ray-worker
-                image: "rayproject/ray-ml:2.9.0-py310-cu121"
+                image: "rayproject/ray-ml:2.9.0-py310-gpu"
                 resources:
                   limits:
                     nvidia.com/gpu: 1
