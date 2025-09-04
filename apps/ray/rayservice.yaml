@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ray
+---
+apiVersion: ray.io/v1
+kind: RayService
+metadata:
+  name: rayservice-serve
+  namespace: ray
+spec:
+  serveConfigV2:
+    applications:
+      - name: transformer-pipeline
+        route_prefix: /infer
+        import_path: "serve_app:graph"
+        runtime_env:
+          working_dir: "https://github.com/JeroendenBoef/ray-serve-gke-showcase/archive/refs/heads/add_flux.zip"
+          pip:
+            - "transformers==4.43.4"
+            - "torch==2.3.1"
+  rayClusterConfig:
+    rayVersion: "2.9.0"
+    enableInTreeAutoscaling: true
+    headGroupSpec:
+      serviceType: ClusterIP
+      rayStartParams: { dashboard-host: "0.0.0.0" }
+      template:
+        spec:
+          nodeSelector: { pool: "cpu" }
+          containers:
+            - name: ray-head
+              image: "rayproject/ray-ml:2.9.0-py310-cu121"
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests: { cpu: "500m", memory: "2Gi" }
+                limits:   { cpu: "1",    memory: "4Gi" }
+              ports:
+                - containerPort: 8265
+                - containerPort: 8000
+    workerGroupSpecs:
+      - groupName: cpu-workers
+        replicas: 0
+        minReplicas: 0
+        maxReplicas: 2
+        template:
+          spec:
+            nodeSelector: { pool: "cpu" }
+            containers:
+              - name: ray-worker
+                image: "rayproject/ray-ml:2.9.0-py310-cu121"
+                resources:
+                  requests: { cpu: "500m", memory: "2Gi" }
+                  limits:   { cpu: "1",    memory: "4Gi" }
+      - groupName: gpu-workers
+        replicas: 0
+        minReplicas: 0
+        maxReplicas: 1
+        rayStartParams: {}
+        template:
+          spec:
+            nodeSelector:
+              pool: "gpu"
+              cloud.google.com/gke-accelerator: "nvidia-tesla-t4"
+            tolerations:
+              - key: "nvidia.com/gpu"
+                operator: "Exists"
+                effect: "NoSchedule"
+            containers:
+              - name: ray-worker
+                image: "rayproject/ray-ml:2.9.0-py310-cu121"
+                resources:
+                  limits:
+                    nvidia.com/gpu: 1
+                    cpu: "2"
+                    memory: "8Gi"
+                  requests:
+                    nvidia.com/gpu: 1
+                    cpu: "1"
+                    memory: "4Gi"
