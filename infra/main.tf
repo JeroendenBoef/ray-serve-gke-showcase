@@ -38,6 +38,7 @@ module "gke" {
       node_locations     = ""
       accelerator_count  = 0
       accelerator_type   = ""
+      gpu_driver_version = ""
     },
     {
       name               = "gpu-pool"
@@ -54,6 +55,7 @@ module "gke" {
       node_locations     = ""
       accelerator_count  = 1
       accelerator_type   = "nvidia-tesla-t4"
+      gpu_driver_version = "LATEST"
     }
   ]
 
