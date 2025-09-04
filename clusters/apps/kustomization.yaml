@@ -4,5 +4,4 @@ resources:
   - ../../apps/ingress-nginx
   - ../../apps/monitoring
   - ../../apps/kuberay
-  - ../../apps/gpu
   - ../../apps/ray
