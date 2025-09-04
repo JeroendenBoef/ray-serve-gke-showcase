@@ -16,6 +16,8 @@ spec:
         - key: "nvidia.com/gpu"
           operator: "Exists"
           effect: "NoSchedule"
+      nodeSelector:
+        cloud.google.com/gke-accelerator: "nvidia-tesla-t4"
       containers:
         - image: "nvidia/k8s-device-plugin:1.15.0"
           name: nvidia-device-plugin-ctr
