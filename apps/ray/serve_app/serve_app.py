@@ -22,7 +22,7 @@ class Preprocess:
 @serve.deployment(
     num_replicas=1,
     autoscaling_config={"min_replicas": 0, "max_replicas": 2, "target_ongoing_requests": 2},
-    ray_actor_options={"num_cpus": 0.25, "num_gpus": 1},  # <— GPU
+    ray_actor_options={"num_cpus": 0.25, "num_gpus": 1},
     max_ongoing_requests=8,
 )
 class Inference:
