@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
 - gotk-components.yaml
 - gotk-sync.yaml
-- apps-kustomization.yaml
+- platform-kustomization.yaml
+- workloads-kustomization.yaml
 
 patches:
   - path: sa-patch.yaml
