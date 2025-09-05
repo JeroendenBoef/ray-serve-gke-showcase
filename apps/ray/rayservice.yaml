@@ -13,7 +13,7 @@ spec:
     applications:
       - name: transformer-pipeline
         route_prefix: /infer
-        import_path: "serve_app:graph"
+        import_path: "apps.ray.serve_app.serve_app:graph"
         runtime_env:
           working_dir: "https://github.com/JeroendenBoef/ray-serve-gke-showcase/archive/refs/heads/add_flux.zip"
           pip:
@@ -42,6 +42,7 @@ spec:
         replicas: 0
         minReplicas: 0
         maxReplicas: 2
+        rayStartParams: {}
         template:
           spec:
             nodeSelector: { pool: "cpu" }
