@@ -43,6 +43,7 @@ spec:
                 - name: client
                   containerPort: 10001
                 - name: gcs
+                  containerPort: 6379
     workerGroupSpecs:
       - groupName: cpu-workers
         replicas: 0
