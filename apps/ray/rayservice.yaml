@@ -16,11 +16,9 @@ spec:
     applications:
       - name: transformer-pipeline
         route_prefix: /infer
-        import_path: "ray-serve-gke-showcase-add_flux.apps.ray.serve_app.serve_app:graph"
+        import_path: "ray-serve-gke-showcase-add_flux.apps.ray.serve_app.test_app:graph"
         runtime_env:
           working_dir: "https://github.com/JeroendenBoef/ray-serve-gke-showcase/archive/refs/heads/add_flux.zip"
-          pip:
-            - "transformers==4.43.4"
   rayClusterConfig:
     rayVersion: "2.9.0"
     enableInTreeAutoscaling: true
@@ -38,27 +36,13 @@ spec:
                 requests: { cpu: "500m", memory: "2Gi" }
                 limits:   { cpu: "1",    memory: "4Gi" }
               ports:
-                - containerPort: 8265
-                - containerPort: 8000
-                - containerPort: 6379
-    headService:
-      metadata:
-        labels:
-          ray.io/cluster: rayservice-serve
-      spec:
-        ports:
-          - name: client
-            port: 10001
-            targetPort: 10001
-          - name: gcs-server
-            port: 6379
-            targetPort: 6379
-          - name: dashboard
-            port: 8265
-            targetPort: 8265
-          - name: serve
-            port: 8000
-            targetPort: 8000
+                - name: dashboard
+                  containerPort: 8265
+                - name: serve
+                  containerPort: 8000
+                - name: client
+                  containerPort: 10001
+                - name: gcs
     workerGroupSpecs:
       - groupName: cpu-workers
         replicas: 0
