@@ -6,8 +6,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
 @serve.deployment(
-    num_replicas=1,
-    autoscaling_config={"min_replicas": 0, "max_replicas": 5, "target_ongoing_requests": 8},
+    autoscaling_config={"min_replicas": 1, "max_replicas": 5, "target_ongoing_requests": 8},
     ray_actor_options={"num_cpus": 0.25},
     max_concurrent_queries=32,
 )
@@ -20,8 +19,7 @@ class Preprocess:
 
 
 @serve.deployment(
-    num_replicas=1,
-    autoscaling_config={"min_replicas": 0, "max_replicas": 2, "target_ongoing_requests": 2},
+    autoscaling_config={"min_replicas": 1, "max_replicas": 2, "target_ongoing_requests": 2},
     ray_actor_options={"num_cpus": 0.25, "num_gpus": 1},
     max_concurrent_queries=8,
 )
@@ -41,8 +39,7 @@ class Inference:
 
 
 @serve.deployment(
-    num_replicas=1,
-    autoscaling_config={"min_replicas": 0, "max_replicas": 5, "target_ongoing_requests": 8},
+    autoscaling_config={"min_replicas": 1, "max_replicas": 5, "target_ongoing_requests": 8},
     ray_actor_options={"num_cpus": 0.25},
     max_concurrent_queries=32,
 )
