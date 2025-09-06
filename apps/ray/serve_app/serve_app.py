@@ -9,7 +9,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
     num_replicas=1,
     autoscaling_config={"min_replicas": 0, "max_replicas": 5, "target_ongoing_requests": 8},
     ray_actor_options={"num_cpus": 0.25},
-    max_ongoing_requests=32,
+    max_concurrent_queries=32,
 )
 class Preprocess:
     def __init__(self, model_name: str = "distilbert-base-uncased-finetuned-sst-2-english"):
@@ -23,7 +23,7 @@ class Preprocess:
     num_replicas=1,
     autoscaling_config={"min_replicas": 0, "max_replicas": 2, "target_ongoing_requests": 2},
     ray_actor_options={"num_cpus": 0.25, "num_gpus": 1},
-    max_ongoing_requests=8,
+    max_concurrent_queries=8,
 )
 class Inference:
     def __init__(self, model_name: str = "distilbert-base-uncased-finetuned-sst-2-english"):
@@ -44,7 +44,7 @@ class Inference:
     num_replicas=1,
     autoscaling_config={"min_replicas": 0, "max_replicas": 5, "target_ongoing_requests": 8},
     ray_actor_options={"num_cpus": 0.25},
-    max_ongoing_requests=32,
+    max_concurrent_queries=32,
 )
 class Postprocess:
     def __call__(self, logits_list: list[torch.Tensor]) -> list[dict[str, Any]]:
