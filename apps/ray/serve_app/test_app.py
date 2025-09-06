@@ -7,4 +7,4 @@ class Echo:
         return {"echo": await request.json()}
 
 
-app = serve.deployment_graph.bind(Echo.bind())
+app = Echo.bind()
