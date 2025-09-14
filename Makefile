@@ -8,7 +8,7 @@ export TF_VAR_kms_key_ring=$(KMS_KEY_RING)
 export TF_VAR_kms_crypto_key=$(KMS_CRYPTO_KEY)
 
 .PHONY: bootstrap-init bootstrap-plan bootstrap-apply init plan plan-save apply-plan infra creds destroy \
-		flux-vars flux-bootstrap flux-reconcile flux-ns flux-known-hosts flux-keygen flux-git-secret-ssh flux-apply flux-up flux-wi-bind flux-restart-kc \
+		flux-vars flux-bootstrap flux-reconcile flux-ns flux-known-hosts flux-keygen flux-git-secret-ssh flux-apply flux-up flux-wi-bind flux-restart-kc flux-wait \
 		sops-init sops-encrypt sops-edit sops-verify
 
 # --- Terraform ---
@@ -108,6 +108,10 @@ flux-wi-bind:
 flux-restart-kc:
 	@kubectl -n flux-system rollout restart deploy/kustomize-controller
 
+flux-wait:
+	flux -n flux-system wait kustomization flux-system --for=apply --timeout=5m
+	flux -n flux-system wait kustomization platform --for=apply --timeout=10m || true
+	flux -n flux-system wait kustomization workloads --for=apply --timeout=10m || true
 
 # --- SOPS ---
 
