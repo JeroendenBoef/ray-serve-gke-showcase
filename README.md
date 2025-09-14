@@ -114,9 +114,10 @@ Encryption is handled by SOPS + KMS, render from template with `make sops-init`.
   - CUDA AMP only when `cuda` is available (prevents CPU half-precision errors)
 
 ### Sending inference requests
-This implementation exposes an endpoint publicly via Ingress-NGINX with a public load balancer IP, excluding authentication. Access should be restricted for production systems. 
+This implementation exposes an endpoint publicly via Ingress-NGINX with a public load balancer IP, excluding authentication. Access should be restricted for production systems.
 
 Send an inference request to `/infer`:
+
 ```bash
 ING=$(kubectl -n ingress-nginx get svc ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 curl -s -X POST "http://$ING/infer" -H "Content-Type: application/json" \
@@ -124,3 +125,43 @@ curl -s -X POST "http://$ING/infer" -H "Content-Type: application/json" \
 ```
 
 ## Smoke tests
+k6 load tests are provided for internal and external requests. External tests will evaluate real-world latency by routing via the ingress and LB. Internal tests isolate app performance without ingress overhead. Run external smoke tests (outside of cluster) with:
+
+```bash
+ING=$(kubectl -n ingress-nginx get svc ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export INFER_URL="http://$ING/infer"
+k6 run --summary-export=results_external.json tests/smoke.js
+```
+
+Run internal smoke tests (within cluster) by applying the configmap and job:
+
+```bash
+kubectl -n ray apply -f k6/k6-config.yaml
+kubectl -n ray apply -f k6/k6-job.yaml
+
+# After pod terminates
+POD=$(kubectl -n ray get pod -l job-name=k6-smoke \
+  --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1:].metadata.name}')
+kubectl -n ray cp -c holder "$POD":/out/results_int.json ./k6/results_internal.json
+```
+
+Thresholds used in these tests are:
+
+```js
+thresholds: {
+  http_req_failed: ['rate<0.01'],
+  http_req_duration: ['p(95)<800'],
+}
+```
+
+### Results & summary
+Full results are in `k6/results_external.json` and `k6/results_internal.json`. Below are extracted and summarized results:
+
+| Scenario | Target RPS | Effective RPS | p95 Latency | Avg Latency | Error Rate | Notes                                                                             |
+| -------- | ---------: | ------------: | ----------: | ----------: | ---------: | --------------------------------------------------------------------------------- |
+| External |   up to 60 |   **15.09/s** | **14.65 s** |      4.74 s | **16.79%** | Hit VU cap & backpressure; ingress + app bottleneck; many dropped iterations.     |
+| Internal |    5→10→15 |    **7.66/s** |  **149 ms** |     67.8 ms |  **0.22%** | Healthy latencies; very low error rate; good app health without Internet/ingress. |
+
+Internal (in-cluster) p95 latency is **~149 ms with 0.22%** errors at ~7.7 req/s.
+External (through Ingress) p95 latency is **~14.7 s with 16.8%** errors when attempting to ramp to 60 req/s; effective throughput capped at ~15 req/s with many dropped iterations.
+This indicates the Ray Serve app is healthy, and the bottleneck for high RPS is ingress+replica capacity and/or autoscaling limits. These tests were performed under the restriction of a global GPU quota of 1. For more insightful tests, global GPU quota should be raised so the `Inference` deployment can be autoscaled. Internal tests were also performed with higher RPS but they also bottlenecked at 15.
