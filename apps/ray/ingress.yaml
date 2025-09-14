@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ray-serve
+  namespace: ray
+spec:
+  selector:
+    ray.io/node-type: head
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ray-serve
+  namespace: ray
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /infer
+            pathType: Prefix
+            backend:
+              service:
+                name: rayservice-serve-serve-svc
+                port:
+                  number: 8000
+          - path: /-/routes
+            pathType: Prefix
+            backend:
+              service:
+                name: rayservice-serve-serve-svc
+                port:
+                  number: 8000
