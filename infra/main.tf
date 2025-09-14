@@ -26,7 +26,7 @@ module "gke" {
     {
       name               = "cpu-pool"
       machine_type       = "e2-standard-2"
-      disk_size_gb       = 50
+      disk_size_gb       = 100
       image_type         = "COS_CONTAINERD"
       preemptible        = true
       initial_node_count = 1
