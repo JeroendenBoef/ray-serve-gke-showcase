@@ -27,6 +27,13 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: ray-serve
+                name: rayservice-serve-serve-svc
+                port:
+                  number: 8000
+          - path: /-/routes
+            pathType: Prefix
+            backend:
+              service:
+                name: rayservice-serve-serve-svc
                 port:
                   number: 8000
