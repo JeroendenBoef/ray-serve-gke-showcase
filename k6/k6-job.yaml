@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-smoke
+  namespace: ray
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: script
+          configMap: { name: k6-script }
+        - name: out
+          emptyDir: {}
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command:
+            - sh
+            - -c
+            - >
+              k6 run --no-thresholds
+              --summary-export=/out/results_int.json
+              /scripts/smoke.js; exit 0
+          env:
+            - name: INFER_URL
+              value: "http://rayservice-serve-serve-svc.ray.svc.cluster.local:8000/infer"
+          volumeMounts:
+            - { name: script, mountPath: /scripts }
+            - { name: out,    mountPath: /out }
+        - name: holder
+          image: busybox
+          command: ["sh","-c","sleep 36000"]
+          volumeMounts:
+            - { name: out, mountPath: /out }
